@@ -1,3 +1,7 @@
+#####################################
+### Usage
+### python cx_setup.py build
+###
 import sys
 from cx_Freeze import setup, Executable
 
@@ -5,7 +9,7 @@ from cx_Freeze import setup, Executable
 build_exe_options = {"packages": ["os"],
                       "excludes": ["tkinter"],
                       "icon": "py.ico"}
-
+install_exe_options = {}
 # GUI applications require a different base on Windows (the default is for a
 # console application).
 base = None

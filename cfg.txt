@@ -1,0 +1,13 @@
+[serial port]
+number = 0
+[405 nm]
+line = 1
+[488 nm]
+line = 2
+[532 nm]
+line = 3
+[561 nm]
+line = 4
+[640 nm]
+line = 5
+

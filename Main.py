@@ -137,9 +137,27 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
             self.aotfcmd_('i0')
         self._lastcmd_=time.strftime('%X')
         for n in range(self.nlines):
-            self.shutter(n+1, 0)
             self.power(n+1, 0)
-#        thread.start_new(self.__repeatPulsing__, ())
+            self.shutter(n+1, 0)       
+
+        # try statusBar     
+        self.statusBar().showMessage('Ready')
+        # try menuBar
+        #self.menuBar = QtGui.QMenuBar()
+        self.menuOperation = QtGui.QMenu()
+        self.menuOperation.setTitle('Operation')
+        self.actionReset = QtGui.QAction(self)
+        self.actionReset.setText('Reset')
+
+        self.menuOperation.addAction(self.actionReset)
+        self.menubar.addMenu(self.menuOperation)
+        QtCore.QObject.connect(self.actionReset,
+                QtCore.SIGNAL('triggered()'),
+                self.resetLaser)
+    def resetLaser(self):
+        for n in range(self.nlines):
+            self.power(n+1, 0)
+            self.shutter(n+1, 0)
 
     def aotfcmd_(self, cmd, wait = 0):
         self.lock.acquire()
@@ -173,9 +191,6 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
     ##define laser 1#########################
     def actionShutterLaserLine1(self):
         self.shutter(1, self.laserLine1Shutter.checkState())
-        #msg = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[0],time.strftime('%X'),int(self.laserLine1PowerEdit.text()),\
-        #self.laserLine1Shutter.checkState())
         self.msg(1)
     def actionPowerSliderLaserLine1(self):
         #self._power[0] = self.laserLine1PowerSlider.value()
@@ -200,9 +215,6 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
     ##define laser 2#########################
     def actionShutterLaserLine2(self):
         self.shutter(2,self.laserLine2Shutter.checkState())
-        #msg = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[1],time.strftime('%X'),int(round(float(self.laserLine2PowerEdit.text()))),\
-        #self.laserLine2Shutter.checkState())
         self.msg(2)
     def actionPowerSliderLaserLine2(self):
         #self._power[1] = self.laserLine2PowerSlider.value()
@@ -219,17 +231,11 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         time.sleep(waitTime)
         self.shutter(2,0)
         #stop = time.strftime('%X')
-        #msg  = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[1],time.strftime('%X'),int(round(float(self.laserLine2PowerEdit.text()))),\
-        #self.laserLine2Shutter.checkState())
         self.msg(2)
     ### end define laser 2 ##########################
     ##define laser 3#########################
     def actionShutterLaserLine3(self):
         self.shutter(3,self.laserLine3Shutter.checkState())
-        #msg = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[2],time.strftime('%X'),int(self.laserLine3PowerEdit.text()),\
-        #self.laserLine3Shutter.checkState())
         self.msg(3)
     def actionPowerSliderLaserLine3(self):
         #self._power[2] = self.laserLine3PowerSlider.value()
@@ -246,17 +252,11 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         time.sleep(waitTime)
         self.shutter(3,0)
         #stop = time.strftime('%X')
-        #msg  = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[2],time.strftime('%X'),int(round(float(self.laserLine3PowerEdit.text()))),\
-        #self.laserLine3Shutter.checkState())
         self.msg(3)
     ### end define laser 3 ##########################
     ##define laser 4#########################
     def actionShutterLaserLine4(self):
         self.shutter(4,self.laserLine4Shutter.checkState())
-        #msg = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[3],time.strftime('%X'),int(round(float(self.laserLine4PowerEdit.text()))),\
-        #self.laserLine4Shutter.checkState())
         self.msg(4)
     def actionPowerSliderLaserLine4(self):
         #self._power[3] = self.laserLine4PowerSlider.value()
@@ -273,9 +273,6 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         time.sleep(waitTime)
         self.shutter(4,0)
         #stop = time.strftime('%X')
-        #msg  = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[3],time.strftime('%X'),int(round(float(self.laserLine4PowerEdit.text()))),\
-        #self.laserLine4Shutter.checkState())
         self.msg(4)
     ### end define laser 4 ##########################
     ##define laser 5#########################
@@ -300,9 +297,6 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         time.sleep(waitTime)
         self.shutter(5,0)
         #stop = time.strftime('%X')
-        #msg  = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
-        #(self.laserlabels[4],time.strftime('%X'),int(round(float(self.laserLine5PowerEdit.text()))),\
-        #self.laserLine5Shutter.checkState())
         self.msg(5)
     ### end define laser 3 ##########################
     

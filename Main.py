@@ -136,9 +136,11 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
             atexit.register(self.aotf.close)
             self.aotfcmd_('i0')
         self._lastcmd_=time.strftime('%X')
-        for n in range(self.nlines):
+        for n in xrange(5):
+            self._shutter[n] = 1
             self.power(n+1, 0)
-            self.shutter(n+1, 0)       
+            self.shutter(n+1, 0)     
+            time.sleep(0.01)
 
         # try statusBar     
         self.statusBar().showMessage('Ready')
@@ -155,9 +157,11 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
                 QtCore.SIGNAL('triggered()'),
                 self.resetLaser)
     def resetLaser(self):
-        for n in range(self.nlines):
-            self.power(n+1, 0)
+        for n in xrange(5):
+            self._shutter[n] = 1
+            self.power(n+1, 0.00)            
             self.shutter(n+1, 0)
+            time.sleep(0.01)
 
     def aotfcmd_(self, cmd, wait = 0):
         self.lock.acquire()
@@ -178,7 +182,7 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
             self.aotfcmd_("o1", 1)
         else: 
             self.aotfcmd_("o0",1)
-        self._shutter[channel-1]=on
+        #self._shutter[channel-1]=on
        
     def power(self, channel, percentage):
         if self._power[channel-1]==percentage: return

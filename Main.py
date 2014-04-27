@@ -4,6 +4,7 @@ import serial
 import time,os
 import threading
 import ConfigParser
+from Arduino import Arduino
 from types import *
 
 from PyQt4 import QtGui,QtCore
@@ -42,6 +43,12 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         self.nlines=len(self.laserlabels)
         self._power=[0]*self.nlines
         self._shutter=[0]*self.nlines
+        # Detect arduino board
+        if "arduino port" in sections:
+            self.arduinoPort = self.cfg.getint("arduino port", "number") - 1
+            self.arduinoPin  = self.cfg.getint("arduino pin", "pin")
+            self.board = Arduino(9600, port=self.arduinoPort)
+            self.board.pinMode(self.arduinoPin, "OUTPUT")
 
         # define close event
         QtCore.QObject.connect(self, QtCore.SIGNAL('triggered()'), self.closeEvent)
@@ -400,6 +407,9 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         # laser 1
         laser1Intensity = self.parseInput(self.seq1Laser1Intensity.text())
         laser2Intensity = self.parseInput(self.seq1Laser2Intensity.text())
+        if self.triggerCCD.isChecked():
+            self.board.digitalWrite(self.arduinoPin, "HIGH")
+            print('set HIGH')
         if laser1Intensity is not None:
             print ('go laser1Intensity is no None')
             if laser2Intensity is not None:
@@ -458,7 +468,8 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
                         break 
         self.seq1Action.setEnabled(True)
         self.seq1Stop.setEnabled(False)
-        self.status.setText('Sequence 1 finished !!!')
+        self.board.digitalWrite(self.arduinoPin, "LOW")
+        self.status.setText('Cycling illumination protocal finished !!!')
     def seq1ActionFcnThread(self):
         self.seq1Action.setEnabled(False)
         self.seq1Stop.setEnabled(True)
@@ -470,6 +481,7 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
             self.seq1Action.setEnabled(True)
             self.seq1Stop.setEnabled(False)
             self.seq1StopFlag = 1
+            self.board.digitalWrite(self.arduinoPin, "LOW")
             #self.seq1Thread.terminate()
     def repeatPulsingThread(self):
         self.repatPulsingThread = threading.Thread(target = self.__repeatPulsing__)

@@ -10,4 +10,7 @@ line = 3
 line = 4
 [640 nm]
 line = 5
-
+[arduino port]
+number = 10
+[arduino pin]
+pin = 2

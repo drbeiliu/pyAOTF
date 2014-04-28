@@ -14,7 +14,7 @@ Currently, pyAOTF includes several features:
 
 ## GUI ##
 -----------------------------------------------
-![A view of pyAOTF](https://github.com/shepherd87/pyAOTF/blob/master/snapshot.png)
+![github](https://github.com/shepherd87/pyAOTF/blob/master/snapshot.png "github")
 
 ## To do list ##
 ------------------------------------------------

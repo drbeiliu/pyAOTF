@@ -6,7 +6,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need fine tuning.
-build_exe_options = {"packages": ["os"],
+build_exe_options = {"packages": ["os","Arduino"],
                       "excludes": ["tkinter"],
                       "icon": "py.ico"}
 install_exe_options = {}

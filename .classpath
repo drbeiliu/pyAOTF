@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/ICY App/icy.jar"/>
+	<classpathentry kind="lib" path="/ICY App/plugins/adufour/connectedcomponents/ConnectedComponents.jar"/>
+	<classpathentry kind="lib" path="/ICY App/plugins/adufour/ezplug/EzPlug.jar"/>
+	<classpathentry kind="lib" path="/ICY App/plugins/nchenouard/spot/DetectionResult.jar"/>
+	<classpathentry kind="lib" path="/ICY App/plugins/fab/ROIPool/ROIPool.jar"/>
+	<classpathentry kind="lib" path="/ICY App/plugins/fab/ROITagger/ROITagger.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/XMLDetectionSaver"/>
+	<classpathentry kind="lib" path="/ICY App/plugins/adufour/blocks/Blocks.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

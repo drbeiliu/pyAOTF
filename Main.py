@@ -22,9 +22,10 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(mainApp, self).__init__(parent)
         self.setupUi(self)
-
+        self.board = None
         # Load configuration file
         cfgpath = os.path.split(os.path.abspath(sys.argv[0]))[0]
+        print cfgpath
         #if sys.argv[0] in dir():
         #    cfgpath=os.path.split(os.path.abspath(__file__))[0]
         #else: # fix for py2exe
@@ -41,14 +42,15 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         self.laserlabels.remove("serial port")
         self.laserlabels.sort()
         self.nlines=len(self.laserlabels)
-        self._power=[0]*self.nlines
+        self._laserpower=[0]*self.nlines
         self._shutter=[0]*self.nlines
         # Detect arduino board
         if "arduino port" in sections:
             self.arduinoPort = self.cfg.getint("arduino port", "number") - 1
             self.arduinoPin  = self.cfg.getint("arduino pin", "pin")
-            self.board = Arduino(9600, port=self.arduinoPort)
-            self.board.pinMode(self.arduinoPin, "OUTPUT")
+            if self.arduinoPort != -1:
+                self.board = Arduino(9600, port=self.arduinoPort)
+                self.board.pinMode(self.arduinoPin, "OUTPUT")
 
         # define close event
         QtCore.QObject.connect(self, QtCore.SIGNAL('triggered()'), self.closeEvent)
@@ -189,34 +191,36 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
             self.aotfcmd_("o1", 1)
         else: 
             self.aotfcmd_("o0",1)
-        #self._shutter[channel-1]=on
+        self._shutter[channel-1]=on
        
     def power(self, channel, percentage):
-        if self._power[channel-1]==percentage: return
+        if self._laserpower[channel-1]==percentage: return
         p=(float(percentage)/100.)*1023
         if p>1023: p=1023
         elif p<0: p=0
         p=int(round(p))
         self.aotfcmd_("l%dp%s\n\n" % (channel, str(p).zfill(4)))
-        self._power[channel-1]=percentage
+        self._laserpower[channel-1]=percentage
     ##define laser 1#########################
     def actionShutterLaserLine1(self):
         self.shutter(1, self.laserLine1Shutter.checkState())
         self.msg(1)
     def actionPowerSliderLaserLine1(self):
-        #self._power[0] = self.laserLine1PowerSlider.value()
+        #self._laserpower[0] = self.laserLine1PowerSlider.value()
         self.power(1, self.laserLine1PowerSlider.value())
-        self.laserLine1PowerEdit.setText(str(self._power[0]))
+        self.laserLine1PowerEdit.setText(str(self._laserpower[0]))
     def actionPowerEditLaserLine1(self):
-        self._power[0] = int(self.laserLine1PowerEdit.text())    
-        self.laserLine1PowerSlider.setValue(self._power[0])
-        self.power(1, self._power[0])
+        # must comment nextline to make this function work
+        # self._laserpower[0] = int(self.laserLine1PowerEdit.text())
+        lp = int(self.laserLine1PowerEdit.text())
+        self.laserLine1PowerSlider.setValue(lp)
+        self.power(1, lp)
     def actionPulseLaserLine1(self):
         waitTime = float(self.laserLine1PulseDuration.text())
         #start = time.strftime('%X')
         self.shutter(1, 1)
         time.sleep(waitTime)
-        self.shutter(1,0)
+        self.shutter(1, 0)
         #stop = time.strftime('%X')
         msg  = 'SHUTTER %s: TIME %s AOTF %.2f STATUS %d' % \
         (self.laserlabels[0],time.strftime('%X'),int(self.laserLine1PowerEdit.text()),\
@@ -228,13 +232,13 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         self.shutter(2,self.laserLine2Shutter.checkState())
         self.msg(2)
     def actionPowerSliderLaserLine2(self):
-        #self._power[1] = self.laserLine2PowerSlider.value()
+        #self._laserpower[1] = self.laserLine2PowerSlider.value()
         self.power(2, self.laserLine2PowerSlider.value())
-        self.laserLine2PowerEdit.setText(str(self._power[1]))
+        self.laserLine2PowerEdit.setText(str(self._laserpower[1]))
     def actionPowerEditLaserLine2(self):
-        self._power[1] = int(self.laserLine2PowerEdit.text())
-        self.power(2,self._power[1])
-        self.laserLine2PowerSlider.setValue(self._power[1])
+        lp = int(self.laserLine2PowerEdit.text()) # temp laser power
+        self.laserLine2PowerSlider.setValue(lp)
+        self.power(2, lp)
     def actionPulseLaserLine2(self):
         waitTime = float(self.laserLine2PulseDuration.text())
         #start = time.strftime('%X')
@@ -249,13 +253,12 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         self.shutter(3,self.laserLine3Shutter.checkState())
         self.msg(3)
     def actionPowerSliderLaserLine3(self):
-        #self._power[2] = self.laserLine3PowerSlider.value()
         self.power(3, self.laserLine3PowerSlider.value())
-        self.laserLine3PowerEdit.setText(str(self._power[2]))
+        self.laserLine3PowerEdit.setText(str(self._laserpower[2]))
     def actionPowerEditLaserLine3(self):
-        self._power[2] = int(self.laserLine3PowerEdit.text())
-        self.power(3,self._power[2])
-        self.laserLine3PowerSlider.setValue(self._power[2])
+        self._laserpower[2] = int(self.laserLine3PowerEdit.text())
+        self.power(3,self._laserpower[2])
+        self.laserLine3PowerSlider.setValue(self._laserpower[2])
     def actionPulseLaserLine3(self):
         waitTime = float(self.laserLine3PulseDuration.text())
         #start = time.strftime('%X')
@@ -267,16 +270,17 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
     ### end define laser 3 ##########################
     ##define laser 4#########################
     def actionShutterLaserLine4(self):
-        self.shutter(4,self.laserLine4Shutter.checkState())
+        self.shutter(4, self.laserLine4Shutter.checkState())
         self.msg(4)
     def actionPowerSliderLaserLine4(self):
-        #self._power[3] = self.laserLine4PowerSlider.value()
+        #self._laserpower[3] = self.laserLine4PowerSlider.value()
         self.power(4, self.laserLine4PowerSlider.value())
-        self.laserLine4PowerEdit.setText(str(self._power[3]))
+        self.laserLine4PowerEdit.setText(str(self._laserpower[3]))
     def actionPowerEditLaserLine4(self):
-        self._power[3] = int(self.laserLine4PowerEdit.text())
-        self.power(4,self._power[3])
-        self.laserLine4PowerSlider.setValue(self._power[3])
+        #self._laserpower[3] = int(self.laserLine4PowerEdit.text())
+        lp = int(self.laserLine4PowerEdit.text())
+        self.power(4, lp)
+        self.laserLine4PowerSlider.setValue(lp)
     def actionPulseLaserLine4(self):#
         waitTime = float(self.laserLine4PulseDuration.text())
         #start = time.strftime('%X')
@@ -294,13 +298,14 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         self.laserLine5Shutter.checkState())
         self.msg(msg)
     def actionPowerSliderLaserLine5(self):
-        #self._power[4] = self.laserLine5PowerSlider.value()
+        #self._laserpower[4] = self.laserLine5PowerSlider.value()
         self.power(5, self.laserLine5PowerSlider.value())
-        self.laserLine5PowerEdit.setText(str(self._power[4]))
+        self.laserLine5PowerEdit.setText(str(self._laserpower[4]))
     def actionPowerEditLaserLine5(self):
-        self._power[4] = int(self.laserLine5PowerEdit.text())
-        self.power(5,self._power[4])
-        self.laserLine5PowerSlider.setValue(self._power[4])
+        #self._laserpower[4] = int(self.laserLine5PowerEdit.text())
+        lp = int(self.laserLine5PowerEdit.text())
+        self.power(5, lp)
+        self.laserLine5PowerSlider.setValue(lp)
     def actionPulseLaserLine5(self):
         waitTime = float(self.laserLine5PulseDuration.text())
         #start = time.strftime('%X')
@@ -352,7 +357,7 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         time.sleep(waitTime)
         self.shutter(n, 0)
         #stop = time.strftime('%X')
-        msg  = 'SHUTTER %s; AOTF %.2f' % (self.laserlabels[n], power)
+        msg  = 'SHUTTER %s; AOTF %.2f' % (self.laserlabels[n-1], power)
         self.msg(msg)
 
 
@@ -362,7 +367,7 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
                 self.repeatPulseIndicator.setText('Stop Pulsing')
                 interval = float(self.repeatPulseDuration.text())
                 n = self.laserlabels.index(self.selectLaserLine.currentText())
-                #print n
+                print n
                 self.actionPulse(n+1)
                 time.sleep(interval)                    
         self.repeatPulseIndicator.setText('Start Pulsing')
@@ -413,14 +418,14 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
         if laser1Intensity is not None:
             print ('go laser1Intensity is no None')
             if laser2Intensity is not None:
-                print ('go laser2Intensity is None')
+                print ('go laser2Intensity is no None')
                 if len(laser1Intensity) != len(laser2Intensity):
                     em = QtGui.QErrorMessage(self)
                     em.showMessage('Laser Intensity Must be Equal !!')
                     return
                 else:
                     for i in range(int(self.seq1NCycles.text())):
-                        self.status.setText('Cycle #' + str(i))
+                        self.status.setText('Cycle #' + str(i + 1))
                         for iIntensity in range(len(laser1Intensity)):
                             if not self.seq1StopFlag:
                                 self.actionPulse(self.seq1Laser1Label.currentIndex()+1, laser1Intensity[iIntensity])
@@ -468,7 +473,8 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
                         break 
         self.seq1Action.setEnabled(True)
         self.seq1Stop.setEnabled(False)
-        self.board.digitalWrite(self.arduinoPin, "LOW")
+        if self.board is not None:
+            self.board.digitalWrite(self.arduinoPin, "LOW")
         self.status.setText('Cycling illumination protocal finished !!!')
     def seq1ActionFcnThread(self):
         self.seq1Action.setEnabled(False)
@@ -481,7 +487,8 @@ class mainApp(QtGui.QMainWindow, Ui_MainWindow):
             self.seq1Action.setEnabled(True)
             self.seq1Stop.setEnabled(False)
             self.seq1StopFlag = 1
-            self.board.digitalWrite(self.arduinoPin, "LOW")
+            if self.board is not None:
+                self.board.digitalWrite(self.arduinoPin, "LOW")
             #self.seq1Thread.terminate()
     def repeatPulsingThread(self):
         self.repatPulsingThread = threading.Thread(target = self.__repeatPulsing__)

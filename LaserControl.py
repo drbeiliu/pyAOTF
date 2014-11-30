@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'LaserControl.ui'
 #
-# Created: Sun Apr 27 16:50:44 2014
+# Created: Sun Nov 30 15:13:39 2014
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!

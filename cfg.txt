@@ -11,6 +11,6 @@ line = 4
 [640 nm]
 line = 5
 [arduino port]
-number = 10
+number = 0
 [arduino pin]
 pin = 2

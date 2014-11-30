@@ -1,4 +1,5 @@
 from distutils.core import setup
+import Arduino
 import py2exe
 import sys,os
 
@@ -9,7 +10,7 @@ setup(
       options = {'py2exe': {
                             'optimize' : 2,
                             'dist_dir' : 'LaserControl',
-                            'includes' : 'sip',
+                            'includes' : ['sip', 'Arduino'],
                             'bundle_files':1 # compress all files into 1 file
                             }},
       name = 'Laser Control- AOTF',

@@ -1,7 +1,7 @@
 # pyAOTF #
 =============================================
 
-Software for **AOTF** control using *Python* 
+Software for **AA AOTF** control using *Python* 
 
 ## Function ##
 -----------------------------------------------
